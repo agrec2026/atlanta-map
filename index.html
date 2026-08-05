@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Atlanta TEMPO NO₂ Map</title>
+
+  <!-- Leaflet stylesheet -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  >
+
+  <!-- Leaflet JavaScript -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin="">
+  </script>
+
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    .title-box {
+      position: absolute;
+      top: 10px;
+      left: 60px;
+      z-index: 1000;
+      padding: 10px 15px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 5px;
+      box-shadow: 0 1px 7px rgba(0, 0, 0, 0.35);
+    }
+
+    .title-box h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .title-box p {
+      margin: 5px 0 0;
+      color: #555;
+      font-size: 13px;
+    }
+
+    .opacity-control {
+      position: absolute;
+      bottom: 30px;
+      left: 10px;
+      z-index: 1000;
+      width: 230px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 5px;
+      box-shadow: 0 1px 7px rgba(0, 0, 0, 0.35);
+    }
+
+    .opacity-control label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    #opacity-slider {
+      width: 100%;
+    }
+
+    .legend {
+      padding: 10px;
+      color: #333;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 5px;
+      box-shadow: 0 1px 7px rgba(0, 0, 0, 0.35);
+      font-size: 12px;
+      line-height: 18px;
+    }
+
+    .legend-title {
+      margin-bottom: 7px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .legend-row {
+      display: flex;
+      align-items: center;
+    }
+
+    .legend-color {
+      width: 18px;
+      height: 18px;
+      margin-right: 7px;
+      border: 1px solid #777;
+    }
+
+    .error-box {
+      position: absolute;
+      top: 85px;
+      left: 60px;
+      z-index: 1100;
+      display: none;
+      max-width: 450px;
+      padding: 10px;
+      color: #8b0000;
+      background: #fff0f0;
+      border: 1px solid #cc0000;
+    }
+
+    @media (max-width: 700px) {
+      .title-box {
+        right: 10px;
+        left: 50px;
+      }
+
+      .title-box h1 {
+        font-size: 16px;
+      }
+
+      .opacity-control {
+        right: 10px;
+        bottom: 20px;
+        left: 10px;
+        width: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="map"></div>
+
+  <div class="title-box">
+    <h1>Atlanta TEMPO NO₂ Map</h1>
+    <p>Click a grid cell to view its NO₂ concentration.</p>
+  </div>
+
+  <div class="opacity-control">
+    <label for="opacity-slider">
+      NO₂ layer opacity:
+      <span id="opacity-value">55%</span>
+    </label>
+
+    <input
+      id="opacity-slider"
+      type="range"
+      min="0"
+      max="100"
+      value="55"
+      step="5"
+    >
+  </div>
+
+  <div id="error-box" class="error-box"></div>
+
+  <script>
+    /*
+      Initial NO2 layer transparency:
+      0.00 = completely transparent
+      1.00 = completely opaque
+    */
+    let currentOpacity = 0.55;
+
+    /*
+      Store all loaded NO2 layers so their opacity
+      can be updated together.
+    */
+    const no2Layers = [];
+
+    /*
+      Replace these filenames with the exact filenames
+      shown in your GitHub repository.
+    */
+    const layerConfigs = [
+      {
+        name: "Morning – Eastward transport",
+        file: "tempo_no2_eastward_morning.geojson"
+      },
+      {
+        name: "Morning – Westward transport",
+        file: "tempo_no2_westward_morning.geojson"
+      },
+      {
+        name: "Afternoon – Eastward transport",
+        file: "tempo_no2_eastward_afternoon.geojson"
+      },
+      {
+        name: "Afternoon – Westward transport",
+        file: "tempo_no2_westward_afternoon.geojson"
+      }
+    ];
+
+    /*
+      Create the map, centered over Atlanta.
+    */
+    const map = L.map("map", {
+      center: [33.78, -84.39],
+      zoom: 9,
+      minZoom: 7,
+      maxZoom: 19
+    });
+
+    /*
+      Add the OpenStreetMap roads/buildings basemap.
+    */
+    const openStreetMap = L.tileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        maxZoom: 19,
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">' +
+          "OpenStreetMap contributors</a>"
+      }
+    ).addTo(map);
+
+    /*
+      The Leaflet layer control will contain the four
+      selectable TEMPO layers.
+    */
+    const layerControl = L.control.layers(
+      {
+        "OpenStreetMap": openStreetMap
+      },
+      {},
+      {
+        collapsed: false,
+        position: "topright"
+      }
+    ).addTo(map);
+
+    /*
+      Convert NO2 concentration to a fill color.
+      Units: 10^15 molecules cm^-2
+    */
+    function getNo2Color(value) {
+      if (!Number.isFinite(value)) return "#808080";
+      if (value < 0.75) return "#ffffcc";
+      if (value < 1.50) return "#ffeda0";
+      if (value < 2.25) return "#feb24c";
+      if (value < 3.00) return "#fd8d3c";
+      if (value < 3.75) return "#f03b20";
+      if (value < 4.50) return "#bd0026";
+      return "#800026";
+    }
+
+    /*
+      Apply NO2 colors and transparency to each polygon.
+    */
+    function styleNo2Feature(feature) {
+      const value = Number(feature.properties.NO2);
+
+      return {
+        fillColor: getNo2Color(value),
+        fillOpacity: currentOpacity,
+        color: "#555555",
+        opacity: 0.30,
+        weight: 0.4
+      };
+    }
+
+    /*
+      Create the popup for each satellite grid cell.
+    */
+    function addPopup(feature, polygon, layerName) {
+      const properties = feature.properties || {};
+      const no2 = Number(properties.NO2);
+
+      const no2Text = Number.isFinite(no2)
+        ? no2.toFixed(2)
+        : "No data";
+
+      const unit =
+        properties.unit || "10^15 molecules cm^-2";
+
+      const timePeriod =
+        properties.timePeriod || "Not specified";
+
+      const popupContent = `
+        <div style="min-width:220px">
+          <strong>${layerName}</strong><br>
+          Time: ${timePeriod}<br>
+          TEMPO NO₂:
+          <strong>${no2Text}</strong>
+          ${unit}
+        </div>
+      `;
+
+      polygon.bindPopup(popupContent);
+
+      polygon.on("mouseover", function () {
+        this.setStyle({
+          color: "#000000",
+          opacity: 1,
+          weight: 1.5
+        });
+      });
+
+      polygon.on("mouseout", function () {
+        this.setStyle({
+          color: "#555555",
+          opacity: 0.30,
+          weight: 0.4
+        });
+      });
+    }
+
+    /*
+      Fetch all four GeoJSON files.
+    */
+    async function loadNo2Layers() {
+      const loadedLayers = await Promise.all(
+        layerConfigs.map(async function (config) {
+          const response = await fetch(config.file);
+
+          if (!response.ok) {
+            throw new Error(
+              `Could not load ${config.file}: ${response.status}`
+            );
+          }
+
+          const geojson = await response.json();
+
+          const layer = L.geoJSON(geojson, {
+            style: styleNo2Feature,
+
+            onEachFeature: function (feature, polygon) {
+              addPopup(feature, polygon, config.name);
+            }
+          });
+
+          return {
+            config: config,
+            layer: layer
+          };
+        })
+      );
+
+      loadedLayers.forEach(function (item, index) {
+        no2Layers.push(item.layer);
+
+        layerControl.addOverlay(
+          item.layer,
+          item.config.name
+        );
+
+        /*
+          Display the first layer when the website opens.
+        */
+        if (index === 0) {
+          item.layer.addTo(map);
+
+          if (item.layer.getBounds().isValid()) {
+            map.fitBounds(
+              item.layer.getBounds(),
+              {
+                padding: [10, 10]
+              }
+            );
+          }
+        }
+      });
+    }
+
+    /*
+      Opacity slider.
+    */
+    const opacitySlider =
+      document.getElementById("opacity-slider");
+
+    const opacityValue =
+      document.getElementById("opacity-value");
+
+    opacitySlider.addEventListener("input", function () {
+      const sliderValue = Number(this.value);
+
+      currentOpacity = sliderValue / 100;
+      opacityValue.textContent = `${sliderValue}%`;
+
+      no2Layers.forEach(function (layer) {
+        layer.setStyle(function (feature) {
+          return styleNo2Feature(feature);
+        });
+      });
+    });
+
+    /*
+      Add a NO2 color legend.
+    */
+    const legend = L.control({
+      position: "bottomright"
+    });
+
+    legend.onAdd = function () {
+      const container = L.DomUtil.create(
+        "div",
+        "legend"
+      );
+
+      const values = [
+        0,
+        0.75,
+        1.50,
+        2.25,
+        3.00,
+        3.75,
+        4.50
+      ];
+
+      const labels = [
+        "0–0.75",
+        "0.75–1.50",
+        "1.50–2.25",
+        "2.25–3.00",
+        "3.00–3.75",
+        "3.75–4.50",
+        "≥ 4.50"
+      ];
+
+      container.innerHTML =
+        '<div class="legend-title">' +
+        "TEMPO NO₂<br>" +
+        "(10¹⁵ molecules cm⁻²)" +
+        "</div>";
+
+      values.forEach(function (value, index) {
+        container.innerHTML += `
+          <div class="legend-row">
+            <span
+              class="legend-color"
+              style="background:${getNo2Color(value)}">
+            </span>
+            <span>${labels[index]}</span>
+          </div>
+        `;
+      });
+
+      return container;
+    };
+
+    legend.addTo(map);
+
+    /*
+      Load the data and display any error visibly.
+    */
+    loadNo2Layers().catch(function (error) {
+      console.error(error);
+
+      const errorBox =
+        document.getElementById("error-box");
+
+      errorBox.style.display = "block";
+      errorBox.textContent =
+        "Map data error: " + error.message;
+    });
+  </script>
+
+</body>
+</html>
