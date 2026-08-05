@@ -216,8 +216,11 @@
       center: [33.78, -84.39],
       zoom: 9,
       minZoom: 7,
-      maxZoom: 19
-    });
+      maxZoom: 19,
+      renderer: L.canvas({
+        padding: 0.5
+      })
+    });    
 
     /*
       Add the OpenStreetMap roads/buildings basemap.
@@ -265,21 +268,17 @@
     /*
       Apply NO2 colors and transparency to each polygon.
     */
-polygon.on("mouseover", function () {
-  this.setStyle({
-    color: "#000000",
-    opacity: 1,
-    weight: 1.5
-  });
-});
-
-polygon.on("mouseout", function () {
-  this.setStyle({
-    color: "transparent",
-    opacity: 0,
-    weight: 0
-  });
-});
+    function styleNo2Feature(feature) {
+      const value = Number(feature.properties.NO2);
+    
+      return {
+        fillColor: getNo2Color(value),
+        fillOpacity: currentOpacity,
+        color: "transparent",
+        opacity: 0,
+        weight: 0
+      };
+    }
 
     /*
       Create the popup for each satellite grid cell.
