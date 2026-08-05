@@ -309,7 +309,7 @@ polygon.on("mouseout", function () {
       `;
 
       polygon.bindPopup(popupContent);
-
+      
       polygon.on("mouseover", function () {
         this.setStyle({
           color: "#000000",
@@ -320,9 +320,9 @@ polygon.on("mouseout", function () {
 
       polygon.on("mouseout", function () {
         this.setStyle({
-          color: "#555555",
-          opacity: 0.30,
-          weight: 0.4
+          color: "transparent",
+          opacity: 0,
+          weight: 0
         });
       });
     }
