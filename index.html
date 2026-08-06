@@ -3,35 +3,42 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <title>Atlanta TEMPO NO₂ and NEI Emissions Map</title>
 
-  <title>Atlanta TEMPO NO<sub>2</sub> Map at 1 km Resolution</title>
-
-  <!-- Leaflet stylesheet -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin=""
+    crossorigin
   >
 
-  <!-- Leaflet JavaScript -->
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin="">
+    integrity="sha256-20nQCchB9coqIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin>
   </script>
 
   <style>
+    :root {
+      --blue: #2457a6;
+      --dark-blue: #173d78;
+      --text: #242424;
+      --muted: #555;
+      --panel: rgba(255, 255, 255, 0.96);
+    }
+
     html,
     body {
+      width: 100%;
       height: 100%;
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      color: var(--text);
     }
 
     #map {
@@ -39,36 +46,136 @@
       height: 100%;
     }
 
+    a {
+      color: #174e99;
+    }
+
     .title-box {
       position: absolute;
       top: 10px;
       left: 60px;
       z-index: 1000;
-      padding: 10px 15px;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 5px;
-      box-shadow: 0 1px 7px rgba(0, 0, 0, 0.35);
+      width: min(690px, calc(100vw - 440px));
+      max-height: 45vh;
+      overflow-y: auto;
+      padding: 12px 15px;
+      background: var(--panel);
+      border-radius: 6px;
+      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.36);
     }
 
     .title-box h1 {
-      margin: 0;
-      font-size: 20px;
+      margin: 0 0 4px;
+      color: #172b4d;
+      font-size: 21px;
     }
 
-    .title-box p {
-      margin: 5px 0 0;
-      color: #555;
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
       font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .about-details {
+      margin-top: 8px;
+      padding-top: 7px;
+      border-top: 1px solid #d8d8d8;
+    }
+
+    .about-details summary {
+      color: #173d78;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 16px;
+      margin-top: 8px;
+      font-size: 12.5px;
+      line-height: 1.45;
+    }
+
+    .about-grid p {
+      margin: 0;
+    }
+
+    .about-wide {
+      grid-column: 1 / -1;
+      padding-top: 6px;
+      border-top: 1px solid #e4e4e4;
+    }
+
+    .source-definition {
+      margin-top: 6px !important;
+      color: #4f4f4f;
+    }
+
+    .selected-layer-info {
+      margin-top: 9px;
+      padding: 8px 10px;
+      background: #edf4ff;
+      border-left: 4px solid var(--blue);
+      border-radius: 3px;
+      font-size: 12.5px;
+      line-height: 1.4;
+    }
+
+    .selected-layer-info strong {
+      color: #173d78;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 9px;
+    }
+
+    .map-button {
+      padding: 8px 11px;
+      color: white;
+      background: var(--blue);
+      border: 0;
+      border-radius: 4px;
+      font-size: 12.5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .map-button:hover,
+    .map-button:focus {
+      background: var(--dark-blue);
+    }
+
+    .map-button.secondary {
+      color: #173d78;
+      background: #e8effa;
+      border: 1px solid #b6c8e4;
+    }
+
+    .map-button.secondary:hover,
+    .map-button.secondary:focus {
+      background: #d7e4f6;
+    }
+
+    .location-status {
+      margin-top: 6px;
+      color: #555;
+      font-size: 11.5px;
     }
 
     .opacity-control {
       position: absolute;
-      bottom: 30px;
+      bottom: 24px;
       left: 10px;
       z-index: 1000;
-      width: 230px;
-      padding: 12px;
-      background: rgba(255, 255, 255, 0.95);
+      width: 220px;
+      padding: 10px 12px;
+      background: var(--panel);
       border-radius: 5px;
       box-shadow: 0 1px 7px rgba(0, 0, 0, 0.35);
     }
@@ -76,7 +183,7 @@
     .opacity-control label {
       display: block;
       margin-bottom: 5px;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: bold;
     }
 
@@ -84,204 +191,372 @@
       width: 100%;
     }
 
-    .legend {
-      padding: 10px;
+    .method-note {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      z-index: 1000;
+      width: min(610px, calc(100vw - 610px));
+      padding: 7px 10px;
+      transform: translateX(-50%);
+      color: #444;
+      background: rgba(255, 255, 255, 0.94);
+      border-radius: 5px;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+      font-size: 10.5px;
+      line-height: 1.35;
+    }
+
+    .legend,
+    .emission-legend {
+      padding: 9px 10px;
       color: #333;
-      background: rgba(255, 255, 255, 0.95);
+      background: var(--panel);
       border-radius: 5px;
       box-shadow: 0 1px 7px rgba(0, 0, 0, 0.35);
-      font-size: 12px;
-      line-height: 18px;
+      font-size: 11.5px;
+      line-height: 17px;
     }
 
     .legend-title {
-      margin-bottom: 7px;
-      font-size: 13px;
+      margin-bottom: 6px;
+      font-size: 12.5px;
       font-weight: bold;
     }
 
     .legend-row {
       display: flex;
       align-items: center;
+      min-height: 18px;
     }
 
     .legend-color {
-      width: 18px;
-      height: 18px;
+      width: 17px;
+      height: 17px;
       margin-right: 7px;
       border: 1px solid #777;
     }
 
+    .marker-symbol {
+      display: inline-block;
+      width: 11px;
+      height: 11px;
+      flex: 0 0 auto;
+      margin-right: 7px;
+      border: 1.5px solid #fff;
+      border-radius: 50%;
+      box-shadow: 0 0 0 1px #555;
+    }
+
+    .legend-note {
+      margin-top: 5px;
+      color: #666;
+      font-size: 10.5px;
+      line-height: 1.3;
+    }
+
     .error-box {
       position: absolute;
-      top: 85px;
-      left: 60px;
-      z-index: 1100;
+      top: 10px;
+      left: 50%;
+      z-index: 2200;
       display: none;
-      max-width: 450px;
+      max-width: 520px;
       padding: 10px;
-      color: #8b0000;
+      transform: translateX(-50%);
+      color: #7a0000;
       background: #fff0f0;
       border: 1px solid #cc0000;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .help-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.72);
+    }
+
+    .help-modal.open {
+      display: flex;
+    }
+
+    .help-content {
+      position: relative;
+      width: min(1100px, 95vw);
+      max-height: 92vh;
+      overflow-y: auto;
+      padding: 24px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .help-content h2 {
+      margin: 0 45px 10px 0;
+      color: #222;
+      font-size: 23px;
+    }
+
+    .help-close {
+      position: absolute;
+      top: 8px;
+      right: 14px;
+      padding: 0;
+      color: #444;
+      background: transparent;
+      border: 0;
+      font-size: 38px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .help-steps {
+      margin: 14px 0 16px;
+      padding-left: 24px;
+      line-height: 1.55;
+    }
+
+    .viewer-link {
+      display: inline-block;
+      margin-bottom: 15px;
+      padding: 9px 14px;
+      color: white;
+      background: var(--blue);
+      border-radius: 4px;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .help-image {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin-top: 5px;
+      border: 1px solid #aaa;
+    }
+
+    .help-note {
+      margin-bottom: 0;
+      color: #555;
+      font-size: 12.5px;
+      line-height: 1.45;
+    }
+
+    .location-popup {
+      min-width: 260px;
+      line-height: 1.45;
+    }
+
+    .popup-note {
+      margin-top: 7px;
+      color: #666;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .hap-popup {
+      width: 355px;
+      max-width: 100%;
+    }
+
+    .hap-chart-wrap {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-top: 9px;
+    }
+
+    .hap-pie {
+      width: 118px;
+      height: 118px;
+      flex: 0 0 auto;
+      border: 1px solid #777;
+      border-radius: 50%;
+    }
+
+    .hap-pie-legend {
+      flex: 1;
+      font-size: 10.5px;
+      line-height: 1.25;
+    }
+
+    .hap-pie-row {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 4px;
+    }
+
+    .hap-pie-color {
+      width: 9px;
+      height: 9px;
+      flex: 0 0 auto;
+      margin: 2px 5px 0 0;
+    }
+
+    .leaflet-control-layers {
+      max-height: 62vh;
+      overflow-y: auto;
+      font-size: 12px;
+    }
+
+    @media (max-width: 980px) {
+      .title-box {
+        width: min(560px, calc(100vw - 350px));
+      }
+
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .about-wide {
+        grid-column: auto;
+      }
+
+      .method-note {
+        right: 10px;
+        left: 255px;
+        width: auto;
+        transform: none;
+      }
     }
 
     @media (max-width: 700px) {
       .title-box {
-        right: 10px;
-        left: 50px;
+        top: 8px;
+        right: 8px;
+        left: 48px;
+        width: auto;
+        max-height: 42vh;
       }
 
       .title-box h1 {
-        font-size: 16px;
+        font-size: 17px;
+      }
+
+      .about-grid {
+        font-size: 12px;
       }
 
       .opacity-control {
-        right: 10px;
-        bottom: 20px;
-        left: 10px;
+        right: 8px;
+        bottom: 96px;
+        left: 8px;
         width: auto;
       }
+
+      .method-note {
+        right: 8px;
+        bottom: 8px;
+        left: 8px;
+        width: auto;
+        transform: none;
+      }
+
+      .help-content {
+        width: 94vw;
+        max-height: 90vh;
+        padding: 18px;
+      }
+
+      .hap-chart-wrap {
+        align-items: flex-start;
+      }
+
+      .hap-pie {
+        width: 95px;
+        height: 95px;
+      }
     }
-  .help-button {
-  margin-top: 9px;
-  padding: 8px 12px;
-  color: white;
-  background: #2457a6;
-  border: none;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.help-button:hover,
-.help-button:focus {
-  background: #173d78;
-}
-
-.help-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 3000;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background: rgba(0, 0, 0, 0.72);
-}
-
-.help-modal.open {
-  display: flex;
-}
-
-.help-content {
-  position: relative;
-  width: min(1150px, 95vw);
-  max-height: 92vh;
-  overflow-y: auto;
-  padding: 24px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
-}
-
-.help-content h2 {
-  margin: 0 45px 10px 0;
-  color: #222;
-  font-size: 24px;
-}
-
-.help-close {
-  position: absolute;
-  top: 8px;
-  right: 14px;
-  padding: 0;
-  color: #444;
-  background: transparent;
-  border: none;
-  font-size: 38px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.help-close:hover,
-.help-close:focus {
-  color: #000;
-}
-
-.help-steps {
-  margin: 15px 0 18px;
-  padding-left: 24px;
-  line-height: 1.55;
-}
-
-.viewer-link {
-  display: inline-block;
-  margin-bottom: 18px;
-  padding: 10px 15px;
-  color: white;
-  background: #2457a6;
-  border-radius: 4px;
-  font-weight: bold;
-  text-decoration: none;
-}
-
-.viewer-link:hover,
-.viewer-link:focus {
-  background: #173d78;
-}
-
-.help-image {
-  display: block;
-  width: 100%;
-  height: auto;
-  margin-top: 5px;
-  border: 1px solid #aaa;
-}
-
-.help-note {
-  margin-bottom: 0;
-  color: #555;
-  font-size: 13px;
-  line-height: 1.45;
-}
-
-@media (max-width: 700px) {
-  .help-content {
-    width: 94vw;
-    max-height: 90vh;
-    padding: 18px;
-  }
-
-  .help-content h2 {
-    font-size: 19px;
-  }
-
-  .help-steps {
-    font-size: 14px;
-  }
-}</style>
+  </style>
 </head>
 
 <body>
-
   <div id="map"></div>
 
-  <div class="title-box">
-    <h1>Atlanta TEMPO NO₂ Map</h1>
-    
-    <p>
-      Click a grid cell to view its NO₂ concentration.
+  <section class="title-box" aria-label="Map introduction and tools">
+    <h1>Atlanta TEMPO NO<sub>2</sub> and Emissions Map</h1>
+
+    <p class="subtitle">
+      Explore summertime satellite NO<sub>2</sub> patterns under contrasting
+      winds and nearby NEI 2020 point-source emissions.
     </p>
-    
-    <button id="help-button" class="help-button" type="button">
-  How to view the latest TEMPO NO₂
-</button>
-  </div>
+
+    <details class="about-details" open>
+      <summary>About TEMPO, NO<sub>2</sub>, and this map</summary>
+
+      <div class="about-grid">
+        <p>
+          <strong>What is TEMPO?</strong><br>
+          NASA's TEMPO instrument observes air-pollution gases across North
+          America every daylight hour from geostationary orbit. Its frequent
+          measurements reveal how pollution changes during the day.
+          <a
+            href="https://www-air.larc.nasa.gov/missions/tempo/index.html"
+            target="_blank"
+            rel="noopener noreferrer">NASA TEMPO mission</a>
+        </p>
+
+        <p>
+          <strong>Where does NO<sub>2</sub> come from?</strong><br>
+          Nitrogen dioxide is produced mainly when fuel burns in vehicles,
+          power plants, aircraft, rail equipment, and industry. Spatial
+          patterns and plumes can indicate which sources may be influencing an
+          area, while winds can move those plumes away from their sources.
+          <a
+            href="https://airquality.gsfc.nasa.gov/no2"
+            target="_blank"
+            rel="noopener noreferrer">NASA NO<sub>2</sub> explanation</a>
+        </p>
+
+        <p class="about-wide">
+          <strong>How is NO<sub>2</sub> related to other pollutants?</strong>
+          NO<sub>2</sub> belongs to the NO<sub>x</sub> family
+          (NO + NO<sub>2</sub>). In sunlight, NO<sub>x</sub> reacts with volatile
+          organic compounds and contributes to ground-level ozone formation.
+          <a
+            href="https://airquality.gsfc.nasa.gov/surface-level-ozone"
+            target="_blank"
+            rel="noopener noreferrer">Learn about surface ozone from NASA</a>.
+          <span class="source-definition">
+            The emissions overlays show NO<sub>x</sub> and hazardous air
+            pollutants (HAPs) reported in the 2020 National Emissions Inventory.
+          </span>
+        </p>
+
+        <p class="about-wide">
+          <strong>Wind groups:</strong> Eastward transport occurred on
+          95 days (54%); westward transport occurred on 65 days (37%). The
+          remaining valid days were not assigned to either transport group.
+        </p>
+      </div>
+    </details>
+
+    <div id="selected-layer-info" class="selected-layer-info">
+      Loading TEMPO NO<sub>2</sub> layers…
+    </div>
+
+    <div class="button-row">
+      <button id="find-me-button" class="map-button" type="button">
+        Find my location
+      </button>
+
+      <button id="help-button" class="map-button secondary" type="button">
+        View latest TEMPO NO<sub>2</sub>
+      </button>
+    </div>
+
+    <div id="location-status" class="location-status" aria-live="polite"></div>
+  </section>
 
   <div class="opacity-control">
     <label for="opacity-slider">
-      NO₂ layer opacity:
+      TEMPO NO<sub>2</sub> opacity:
       <span id="opacity-value">55%</span>
     </label>
 
@@ -295,137 +570,160 @@
     >
   </div>
 
-  <div id="error-box" class="error-box"></div>
-  <div
-  id="help-modal"
-  class="help-modal"
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="help-title">
-
-  <div class="help-content">
-
-    <button
-      id="help-close"
-      class="help-close"
-      type="button"
-      aria-label="Close instructions">
-      &times;
-    </button>
-
-    <h2 id="help-title">
-      How to view the latest TEMPO NO₂
-    </h2>
-
-    <p>
-      Use the official TEMPO public viewer to explore
-      recent hourly NO₂ observations for your location.
-    </p>
-
-    <ol class="help-steps">
-      <li>
-        Open the official TEMPO public data page.
-      </li>
-
-      <li>
-        Enter your city or ZIP code in the search box.
-      </li>
-
-      <li>
-        Select a date.
-      </li>
-
-      <li>
-        Optionally select a featured topic such as
-        traffic patterns, wildfires, or industrial sources.
-      </li>
-
-      <li>
-        Drag the timeline marker to view a particular hour.
-      </li>
-
-      <li>
-        Select the play button to animate NO<sub>2</sub> throughout
-        the day.
-      </li>
-    </ol>
-
+  <aside class="method-note">
+    TEMPO data were oversampled to a 0.01° grid using Sun et al. (2018),
+    “A physics-based approach to oversample multi-satellite, multispecies
+    observations to a common grid,” <em>Atmospheric Measurement Techniques</em>,
+    11, 6679–6701.
     <a
-      class="viewer-link"
-      href="https://tempo.si.edu/data_for_public.html"
+      href="https://doi.org/10.5194/amt-11-6679-2018"
       target="_blank"
-      rel="noopener noreferrer">
-      Open the official TEMPO data viewer
-    </a>
+      rel="noopener noreferrer">https://doi.org/10.5194/amt-11-6679-2018</a>
+  </aside>
 
-    <img
-      class="help-image"
-      src="tempo_viewer_instructions.png"
-      alt="Annotated instructions showing how to search for a location, select a date, move the hourly timeline, and play the TEMPO nitrogen dioxide map."
-    >
+  <div id="error-box" class="error-box" role="alert"></div>
 
-    <p class="help-note">
-      TEMPO observations are available during daylight
-      hours.
-    </p>
+  <div
+    id="help-modal"
+    class="help-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="help-title">
 
+    <div class="help-content">
+      <button
+        id="help-close"
+        class="help-close"
+        type="button"
+        aria-label="Close instructions">
+        &times;
+      </button>
+
+      <h2 id="help-title">How to view the latest TEMPO NO<sub>2</sub></h2>
+
+      <p>
+        Use the official TEMPO public viewer to explore recent hourly
+        NO<sub>2</sub> observations for your location.
+      </p>
+
+      <ol class="help-steps">
+        <li>Open the official TEMPO public data page.</li>
+        <li>Enter your city or ZIP code in the search box.</li>
+        <li>Select a date.</li>
+        <li>
+          Optionally select a featured topic such as traffic patterns,
+          wildfires, or industrial sources.
+        </li>
+        <li>Drag the timeline marker to select an hour.</li>
+        <li>Click Play to animate NO<sub>2</sub> throughout the day.</li>
+      </ol>
+
+      <a
+        class="viewer-link"
+        href="https://tempo.si.edu/data_for_public.html"
+        target="_blank"
+        rel="noopener noreferrer">
+        Open the official TEMPO data viewer
+      </a>
+
+      <p>
+        Website:
+        <a
+          href="https://tempo.si.edu/data_for_public.html"
+          target="_blank"
+          rel="noopener noreferrer">https://tempo.si.edu/data_for_public.html</a>
+      </p>
+
+      <img
+        class="help-image"
+        src="tempo_viewer_instructions.png"
+        alt="Annotated instructions showing how to search for a location, select a date, move the hourly timeline, and play the TEMPO nitrogen dioxide map."
+      >
+
+      <p class="help-note">
+        TEMPO observes during daylight hours. Satellite NO<sub>2</sub> columns
+        describe the amount of NO<sub>2</sub> through the atmosphere; they are
+        not direct measurements of personal exposure at ground level.
+      </p>
+    </div>
   </div>
-</div>
-  
 
   <script>
-    /*
-      Initial NO2 layer transparency:
-      0.00 = completely transparent
-      1.00 = completely opaque
-    */
+    "use strict";
+
     let currentOpacity = 0.55;
+    let activeNo2Layer = null;
+    let activeNo2Config = null;
+    let userLocationMarker = null;
+    let userAccuracyCircle = null;
 
-    /*
-      Store all loaded NO2 layers so their opacity
-      can be updated together.
-    */
     const no2Layers = [];
+    const no2LayerItems = [];
+    const noxSourceRecords = [];
+    const hapLocationRecords = [];
 
-    /*
-      Replace these filenames with the exact filenames
-      shown in your GitHub repository.
-    */
+    const sourceLabels = {
+      airports: "Airports",
+      egucems: "EGU CEMS",
+      egunoncems: "EGU non-CEMS",
+      railyard: "Railyards"
+    };
+
+    const noxThresholds = {
+      airports: 150,
+      egucems: 250,
+      egunoncems: 150,
+      railyard: 100
+    };
+
+    const noxColors = {
+      airports: "#7b2cbf",
+      egucems: "#d73027",
+      egunoncems: "#f58b45",
+      railyard: "#1769aa"
+    };
+
+    const hapColor = "#00897b";
+
     const layerConfigs = [
       {
-        name: "Morning – Eastward transport",
-        file: "tempo_no2_eastward_morning.geojson"
+        name: "Morning 08:00–10:00 LT — Eastward",
+        file: "tempo_no2_eastward_morning.geojson",
+        period: "08:00–10:00 local time",
+        transport: "Eastward transport (winds from the west)",
+        frequency: "95 days; 54% of valid days"
       },
       {
-        name: "Morning – Westward transport",
-        file: "tempo_no2_westward_morning.geojson"
+        name: "Morning 08:00–10:00 LT — Westward",
+        file: "tempo_no2_westward_morning.geojson",
+        period: "08:00–10:00 local time",
+        transport: "Westward transport (winds from the east)",
+        frequency: "65 days; 37% of valid days"
       },
       {
-        name: "Afternoon – Eastward transport",
-        file: "tempo_no2_eastward_afternoon.geojson"
+        name: "Afternoon 12:00–14:00 LT — Eastward",
+        file: "tempo_no2_eastward_afternoon.geojson",
+        period: "12:00–14:00 local time",
+        transport: "Eastward transport (winds from the west)",
+        frequency: "95 days; 54% of valid days"
       },
       {
-        name: "Afternoon – Westward transport",
-        file: "tempo_no2_westward_afternoon.geojson"
+        name: "Afternoon 12:00–14:00 LT — Westward",
+        file: "tempo_no2_westward_afternoon.geojson",
+        period: "12:00–14:00 local time",
+        transport: "Westward transport (winds from the east)",
+        frequency: "65 days; 37% of valid days"
       }
     ];
 
-    /*
-      Create the map, centered over Atlanta.
-    */
     const map = L.map("map", {
       center: [33.78, -84.39],
       zoom: 9,
       minZoom: 7,
       maxZoom: 19,
-      renderer: L.canvas({
-        padding: 0.5
-      })
-    });    
+      renderer: L.canvas({ padding: 0.5 })
+    });
 
-    /*
-      Add the OpenStreetMap roads/buildings basemap.
-    */
     const openStreetMap = L.tileLayer(
       "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
       {
@@ -437,24 +735,37 @@
     ).addTo(map);
 
     /*
-      The Leaflet layer control will contain the four
-      selectable TEMPO layers.
+      TEMPO layers are registered as base layers so users select one at a
+      time. OpenStreetMap remains underneath because it is not registered
+      with this control.
     */
     const layerControl = L.control.layers(
-      {
-        "OpenStreetMap": openStreetMap
-      },
+      {},
       {},
       {
-        collapsed: false,
+        collapsed: window.innerWidth < 900,
         position: "topright"
       }
     ).addTo(map);
 
-    /*
-      Convert NO2 concentration to a fill color.
-      Units: 10^15 molecules cm^-2
-    */
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function reportError(message) {
+      console.error(message);
+      const box = document.getElementById("error-box");
+      box.style.display = "block";
+      const line = document.createElement("div");
+      line.textContent = message;
+      box.appendChild(line);
+    }
+
     function getNo2Color(value) {
       if (!Number.isFinite(value)) return "#808080";
       if (value < 0.75) return "#ffffcc";
@@ -466,12 +777,9 @@
       return "#800026";
     }
 
-    /*
-      Apply NO2 colors and transparency to each polygon.
-    */
     function styleNo2Feature(feature) {
       const value = Number(feature.properties.NO2);
-    
+
       return {
         fillColor: getNo2Color(value),
         fillOpacity: currentOpacity,
@@ -481,154 +789,520 @@
       };
     }
 
-    /*
-      Create the popup for each satellite grid cell.
-    */
-    function addPopup(feature, polygon, layerName) {
+    function addNo2Popup(feature, polygon, config) {
       const properties = feature.properties || {};
       const no2 = Number(properties.NO2);
+      const no2Text = Number.isFinite(no2) ? no2.toFixed(2) : "No data";
+      const unit = properties.unit || "10^15 molecules cm^-2";
 
-      const no2Text = Number.isFinite(no2)
-        ? no2.toFixed(2)
-        : "No data";
-
-      const unit =
-        properties.unit || "10^15 molecules cm^-2";
-
-      const timePeriod =
-        properties.timePeriod || "Not specified";
-
-      const popupContent = `
-        <div style="min-width:220px">
-          <strong>${layerName}</strong><br>
-          Time: ${timePeriod}<br>
-          TEMPO NO<sub>2</sub>:
-          <strong>${no2Text}</strong>
-          ${unit}
+      polygon.bindPopup(`
+        <div style="min-width:245px;line-height:1.45">
+          <strong>${escapeHtml(config.transport)}</strong><br>
+          ${escapeHtml(config.period)}<br>
+          JJA 2024–2025 mean; TEMPO L2 NO<sub>2</sub> V04<br>
+          NO<sub>2</sub> vertical column:
+          <strong>${escapeHtml(no2Text)}</strong>
+          ${escapeHtml(unit)}
+          <div class="popup-note">
+            This satellite column is not a direct surface concentration or
+            personal-exposure measurement.
+          </div>
         </div>
-      `;
+      `);
 
-      polygon.bindPopup(popupContent);
-      
       polygon.on("mouseover", function () {
-        this.setStyle({
-          color: "#000000",
-          opacity: 1,
-          weight: 1.5
-        });
+        this.setStyle({ color: "#000", opacity: 1, weight: 1.2 });
       });
 
       polygon.on("mouseout", function () {
-        this.setStyle({
-          color: "transparent",
-          opacity: 0,
-          weight: 0
-        });
+        this.setStyle({ color: "transparent", opacity: 0, weight: 0 });
       });
     }
 
-    /*
-      Fetch all four GeoJSON files.
-    */
+    function updateSelectedLayerInfo(config) {
+      const container = document.getElementById("selected-layer-info");
+
+      if (!config) {
+        container.innerHTML = "No TEMPO NO<sub>2</sub> layer is selected.";
+        return;
+      }
+
+      container.innerHTML = `
+        <strong>Selected TEMPO layer:</strong>
+        ${escapeHtml(config.period)} · ${escapeHtml(config.transport)}<br>
+        Average over June–August 2024–2025 using TEMPO L2 NO<sub>2</sub>
+        Version 04. Wind-group frequency: ${escapeHtml(config.frequency)}.
+      `;
+    }
+
     async function loadNo2Layers() {
-      const loadedLayers = await Promise.all(
-        layerConfigs.map(async function (config) {
-          const response = await fetch(config.file);
+      let firstSuccessfulLayer = true;
+
+      for (const config of layerConfigs) {
+        try {
+          const response = await fetch(config.file + "?v=20260806");
 
           if (!response.ok) {
-            throw new Error(
-              `Could not load ${config.file}: ${response.status}`
-            );
+            throw new Error(`${config.file}: HTTP ${response.status}`);
           }
 
           const geojson = await response.json();
-
           const layer = L.geoJSON(geojson, {
             style: styleNo2Feature,
-
             onEachFeature: function (feature, polygon) {
-              addPopup(feature, polygon, config.name);
+              addNo2Popup(feature, polygon, config);
             }
           });
 
-          return {
-            config: config,
-            layer: layer
-          };
-        })
-      );
+          no2Layers.push(layer);
+          no2LayerItems.push({ layer: layer, config: config });
+          layerControl.addBaseLayer(layer, config.name);
 
-      loadedLayers.forEach(function (item, index) {
-        no2Layers.push(item.layer);
+          if (firstSuccessfulLayer) {
+            layer.addTo(map);
+            activeNo2Layer = layer;
+            activeNo2Config = config;
+            updateSelectedLayerInfo(config);
 
-        layerControl.addOverlay(
-          item.layer,
-          item.config.name
-        );
+            if (layer.getBounds().isValid()) {
+              map.fitBounds(layer.getBounds(), { padding: [10, 10] });
+            }
 
-        /*
-          Display the first layer when the website opens.
-        */
-        if (index === 0) {
-          item.layer.addTo(map);
-
-          if (item.layer.getBounds().isValid()) {
-            map.fitBounds(
-              item.layer.getBounds(),
-              {
-                padding: [10, 10]
-              }
-            );
+            firstSuccessfulLayer = false;
           }
+        } catch (error) {
+          reportError("TEMPO layer did not load: " + error.message);
         }
-      });
+      }
+
+      if (firstSuccessfulLayer) {
+        updateSelectedLayerInfo(null);
+      }
     }
 
-    /*
-      Opacity slider.
-    */
-    const opacitySlider =
-      document.getElementById("opacity-slider");
+    map.on("baselayerchange", function (event) {
+      const item = no2LayerItems.find(function (candidate) {
+        return candidate.layer === event.layer;
+      });
 
-    const opacityValue =
-      document.getElementById("opacity-value");
+      if (item) {
+        activeNo2Layer = item.layer;
+        activeNo2Config = item.config;
+        updateSelectedLayerInfo(item.config);
+      }
+    });
+
+    const opacitySlider = document.getElementById("opacity-slider");
+    const opacityValue = document.getElementById("opacity-value");
 
     opacitySlider.addEventListener("input", function () {
       const sliderValue = Number(this.value);
-
       currentOpacity = sliderValue / 100;
       opacityValue.textContent = `${sliderValue}%`;
 
       no2Layers.forEach(function (layer) {
-        layer.setStyle(function (feature) {
-          return styleNo2Feature(feature);
-        });
+        layer.setStyle(styleNo2Feature);
       });
     });
 
-    /*
-      Add a NO2 color legend.
-    */
-    const legend = L.control({
-      position: "bottomright"
-    });
+    function noxMarkerRadius(emission, maximum) {
+      if (!Number.isFinite(emission) || emission <= 0 || maximum <= 0) {
+        return 5;
+      }
 
-    legend.onAdd = function () {
-      const container = L.DomUtil.create(
-        "div",
-        "legend"
+      return 5 + 15 * Math.sqrt(emission / maximum);
+    }
+
+    async function loadNoxLayers() {
+      const response = await fetch(
+        "nei2020_nox_point_sources.geojson?v=20260806"
       );
 
-      const values = [
-        0,
-        0.75,
-        1.50,
-        2.25,
-        3.00,
-        3.75,
-        4.50
-      ];
+      if (!response.ok) {
+        throw new Error(`NOx sources: HTTP ${response.status}`);
+      }
 
+      const geojson = await response.json();
+      const validFeatures = (geojson.features || []).filter(function (feature) {
+        const coordinates = feature.geometry?.coordinates || [];
+        const emission = Number(feature.properties?.emissions_tpy);
+
+        return feature.geometry?.type === "Point" &&
+          Number.isFinite(Number(coordinates[0])) &&
+          Number.isFinite(Number(coordinates[1])) &&
+          Number.isFinite(emission);
+      });
+
+      const maximumEmission = Math.max(
+        ...validFeatures.map(function (feature) {
+          return Number(feature.properties.emissions_tpy);
+        }),
+        1
+      );
+
+      const categoryLayers = {};
+      Object.keys(sourceLabels).forEach(function (sourceType) {
+        categoryLayers[sourceType] = L.layerGroup();
+      });
+
+      validFeatures.forEach(function (feature) {
+        const properties = feature.properties || {};
+        const coordinates = feature.geometry.coordinates;
+        const lon = Number(coordinates[0]);
+        const lat = Number(coordinates[1]);
+        const emission = Number(properties.emissions_tpy);
+        const sourceType = String(properties.source_type || "").toLowerCase();
+
+        if (!categoryLayers[sourceType]) return;
+
+        const marker = L.circleMarker([lat, lon], {
+          radius: noxMarkerRadius(emission, maximumEmission),
+          color: "#fff",
+          weight: 1.2,
+          fillColor: noxColors[sourceType],
+          fillOpacity: 0.82
+        });
+
+        marker.bindPopup(`
+          <div style="min-width:220px;line-height:1.45">
+            <strong>NEI 2020 NO<sub>x</sub> source</strong><br>
+            Category: ${escapeHtml(sourceLabels[sourceType])}<br>
+            Annual NO<sub>x</sub> emissions:
+            <strong>${emission.toFixed(1)} tons/year</strong><br>
+            Display threshold: ≥ ${noxThresholds[sourceType]} tons/year
+          </div>
+        `);
+
+        marker.addTo(categoryLayers[sourceType]);
+        noxSourceRecords.push({
+          latlng: L.latLng(lat, lon),
+          sourceType: sourceType,
+          emission: emission
+        });
+      });
+
+      Object.keys(sourceLabels).forEach(function (sourceType) {
+        layerControl.addOverlay(
+          categoryLayers[sourceType],
+          `NOx — ${sourceLabels[sourceType]} (≥${noxThresholds[sourceType]} t/yr)`
+        );
+      });
+    }
+
+    const pieColors = [
+      "#006d77",
+      "#e29578",
+      "#5e60ce",
+      "#ffb703",
+      "#2a9d8f",
+      "#b8b8b8"
+    ];
+
+    function buildHapPopup(group) {
+      const pollutantRows = Array.from(group.pollutants.values())
+        .sort(function (a, b) { return b.emission - a.emission; });
+
+      const total = pollutantRows.reduce(function (sum, row) {
+        return sum + row.emission;
+      }, 0);
+
+      const topFive = pollutantRows.slice(0, 5);
+      const topFiveTotal = topFive.reduce(function (sum, row) {
+        return sum + row.emission;
+      }, 0);
+
+      const segments = topFive.map(function (row) {
+        return {
+          label: row.name,
+          cas: row.cas,
+          percentage: total > 0 ? 100 * row.emission / total : 0
+        };
+      });
+
+      const otherEmission = Math.max(0, total - topFiveTotal);
+      if (otherEmission > 1e-10) {
+        segments.push({
+          label: "Other HAPs",
+          cas: "",
+          percentage: total > 0 ? 100 * otherEmission / total : 0
+        });
+      }
+
+      let cumulative = 0;
+      const gradientParts = segments.map(function (segment, index) {
+        const start = cumulative;
+        cumulative += segment.percentage;
+        return `${pieColors[index]} ${start.toFixed(2)}% ${cumulative.toFixed(2)}%`;
+      });
+
+      const legendRows = segments.map(function (segment, index) {
+        const casText = segment.cas
+          ? ` <span style="color:#666">(CAS ${escapeHtml(segment.cas)})</span>`
+          : "";
+
+        return `
+          <div class="hap-pie-row">
+            <span
+              class="hap-pie-color"
+              style="background:${pieColors[index]}">
+            </span>
+            <span>
+              ${escapeHtml(segment.label)}${casText}:
+              <strong>${segment.percentage.toFixed(1)}%</strong>
+            </span>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="hap-popup">
+          <strong>NEI 2020 HAP emission location</strong><br>
+          Source category: ${escapeHtml(Array.from(group.sourceTypes)
+            .map(function (type) { return sourceLabels[type] || type; })
+            .join(", "))}<br>
+          Total listed HAP emissions:
+          <strong>${total.toFixed(3)} tons/year</strong><br>
+          <div style="margin-top:7px;font-weight:bold">
+            Top five HAPs by annual emissions
+          </div>
+          <div class="hap-chart-wrap">
+            <div
+              class="hap-pie"
+              role="img"
+              aria-label="Pie chart of the top five hazardous air pollutants"
+              style="background:conic-gradient(${gradientParts.join(",")})">
+            </div>
+            <div class="hap-pie-legend">${legendRows}</div>
+          </div>
+          <div class="popup-note">
+            Percentages are shares of total HAP emissions reported at this
+            mapped location. “Other HAPs” combines pollutants outside the top five.
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadHapLayer() {
+      const response = await fetch(
+        "nei2020_hap_point_sources.geojson?v=20260806"
+      );
+
+      if (!response.ok) {
+        throw new Error(`HAP sources: HTTP ${response.status}`);
+      }
+
+      const geojson = await response.json();
+      const groups = new Map();
+
+      (geojson.features || []).forEach(function (feature) {
+        if (feature.geometry?.type !== "Point") return;
+
+        const coordinates = feature.geometry.coordinates || [];
+        const lon = Number(coordinates[0]);
+        const lat = Number(coordinates[1]);
+        const properties = feature.properties || {};
+        const emission = Number(properties.emissions_tpy);
+
+        if (!Number.isFinite(lon) ||
+            !Number.isFinite(lat) ||
+            !Number.isFinite(emission) ||
+            emission < 0) {
+          return;
+        }
+
+        const sourceType = String(properties.source_type || "unknown")
+          .toLowerCase();
+        const pollutantName = String(
+          properties.pollutant_name || "Unnamed HAP"
+        );
+        const cas = String(properties.CAS_number || "");
+        const locationKey = `${lon.toFixed(5)}|${lat.toFixed(5)}`;
+
+        if (!groups.has(locationKey)) {
+          groups.set(locationKey, {
+            lon: lon,
+            lat: lat,
+            sourceTypes: new Set(),
+            pollutants: new Map()
+          });
+        }
+
+        const group = groups.get(locationKey);
+        group.sourceTypes.add(sourceType);
+        const pollutantKey = `${pollutantName}|${cas}`;
+
+        if (!group.pollutants.has(pollutantKey)) {
+          group.pollutants.set(pollutantKey, {
+            name: pollutantName,
+            cas: cas,
+            emission: 0
+          });
+        }
+
+        group.pollutants.get(pollutantKey).emission += emission;
+      });
+
+      const hapLayer = L.layerGroup();
+
+      groups.forEach(function (group) {
+        const marker = L.circleMarker([group.lat, group.lon], {
+          radius: 7,
+          color: "#fff",
+          weight: 1.3,
+          fillColor: hapColor,
+          fillOpacity: 0.9
+        });
+
+        marker.bindPopup(buildHapPopup(group), { maxWidth: 420 });
+        marker.addTo(hapLayer);
+
+        hapLocationRecords.push({
+          latlng: L.latLng(group.lat, group.lon),
+          group: group
+        });
+      });
+
+      layerControl.addOverlay(
+        hapLayer,
+        "HAP emission locations — NEI 2020"
+      );
+    }
+
+    function findNo2AtLocation(latlng) {
+      if (!activeNo2Layer) return null;
+
+      let match = null;
+
+      activeNo2Layer.eachLayer(function (cell) {
+        if (match || typeof cell.getBounds !== "function") return;
+
+        if (cell.getBounds().contains(latlng)) {
+          const value = Number(cell.feature?.properties?.NO2);
+          if (Number.isFinite(value)) match = value;
+        }
+      });
+
+      return match;
+    }
+
+    function buildLocationPopup(latlng) {
+      const no2 = findNo2AtLocation(latlng);
+      const radiusMeters = 10000;
+
+      const nearbyNox = noxSourceRecords.filter(function (record) {
+        return latlng.distanceTo(record.latlng) <= radiusMeters;
+      });
+
+      const nearbyHap = hapLocationRecords.filter(function (record) {
+        return latlng.distanceTo(record.latlng) <= radiusMeters;
+      });
+
+      nearbyNox.sort(function (a, b) {
+        return latlng.distanceTo(a.latlng) - latlng.distanceTo(b.latlng);
+      });
+
+      nearbyHap.sort(function (a, b) {
+        return latlng.distanceTo(a.latlng) - latlng.distanceTo(b.latlng);
+      });
+
+      const no2Text = Number.isFinite(no2)
+        ? `<strong>${no2.toFixed(2)} × 10<sup>15</sup> molecules cm<sup>−2</sup></strong>`
+        : "No valid TEMPO grid value at this location";
+
+      let noxText = `${nearbyNox.length} displayed NO<sub>x</sub> source(s)`;
+      if (nearbyNox.length > 0) {
+        const nearest = nearbyNox[0];
+        const distanceKm = latlng.distanceTo(nearest.latlng) / 1000;
+        noxText += `<br>Nearest: ${escapeHtml(sourceLabels[nearest.sourceType])}, ` +
+          `${distanceKm.toFixed(1)} km away, ` +
+          `${nearest.emission.toFixed(1)} tons/year`;
+      }
+
+      let hapText = `${nearbyHap.length} HAP emission location(s)`;
+      if (nearbyHap.length > 0) {
+        const distanceKm = latlng.distanceTo(nearbyHap[0].latlng) / 1000;
+        hapText += `<br>Nearest mapped HAP location: ${distanceKm.toFixed(1)} km away`;
+      }
+
+      const layerText = activeNo2Config
+        ? `${escapeHtml(activeNo2Config.period)}, ${escapeHtml(activeNo2Config.transport)}`
+        : "No TEMPO layer selected";
+
+      return `
+        <div class="location-popup">
+          <strong>Your approximate location</strong><br>
+          Selected TEMPO layer: ${layerText}<br>
+          NO<sub>2</sub> vertical column: ${no2Text}<br><br>
+          <strong>Within 10 km:</strong><br>
+          ${noxText}<br>
+          ${hapText}
+          <div class="popup-note">
+            Location is supplied by your device. The TEMPO value is an
+            atmospheric column, not a direct personal-exposure or surface-level
+            measurement. Inventory proximity alone does not determine exposure;
+            emissions, winds, chemistry, and distance all matter.
+          </div>
+        </div>
+      `;
+    }
+
+    const findMeButton = document.getElementById("find-me-button");
+    const locationStatus = document.getElementById("location-status");
+
+    findMeButton.addEventListener("click", function () {
+      if (!navigator.geolocation) {
+        locationStatus.textContent =
+          "Location services are not supported by this browser.";
+        return;
+      }
+
+      locationStatus.textContent = "Requesting your location…";
+      map.locate({
+        setView: true,
+        maxZoom: 13,
+        enableHighAccuracy: true,
+        timeout: 12000
+      });
+    });
+
+    map.on("locationfound", function (event) {
+      locationStatus.textContent = "Location found.";
+
+      if (userLocationMarker) map.removeLayer(userLocationMarker);
+      if (userAccuracyCircle) map.removeLayer(userAccuracyCircle);
+
+      userAccuracyCircle = L.circle(event.latlng, {
+        radius: event.accuracy,
+        color: "#1464b4",
+        weight: 1,
+        fillColor: "#4aa3df",
+        fillOpacity: 0.12
+      }).addTo(map);
+
+      userLocationMarker = L.circleMarker(event.latlng, {
+        radius: 8,
+        color: "#fff",
+        weight: 2,
+        fillColor: "#005bbb",
+        fillOpacity: 1
+      }).addTo(map);
+
+      userLocationMarker
+        .bindPopup(buildLocationPopup(event.latlng), { maxWidth: 390 })
+        .openPopup();
+    });
+
+    map.on("locationerror", function (event) {
+      locationStatus.textContent =
+        "Location could not be found. Please allow location access and try again.";
+      console.warn(event.message);
+    });
+
+    const no2Legend = L.control({ position: "bottomright" });
+
+    no2Legend.onAdd = function () {
+      const container = L.DomUtil.create("div", "legend");
+      const values = [0, 0.75, 1.50, 2.25, 3.00, 3.75, 4.50];
       const labels = [
         "0–0.75",
         "0.75–1.50",
@@ -640,10 +1314,8 @@
       ];
 
       container.innerHTML =
-        '<div class="legend-title">' +
-        "TEMPO NO₂<br>" +
-        "(10¹⁵ molecules cm⁻²)" +
-        "</div>";
+        '<div class="legend-title">TEMPO NO<sub>2</sub> column<br>' +
+        '(10<sup>15</sup> molecules cm<sup>−2</sup>)</div>';
 
       values.forEach(function (value, index) {
         container.innerHTML += `
@@ -660,69 +1332,84 @@
       return container;
     };
 
-    legend.addTo(map);
+    no2Legend.addTo(map);
 
-    /*
-      Load the data and display any error visibly.
-    */
-    loadNo2Layers().catch(function (error) {
-      console.error(error);
+    const emissionLegend = L.control({ position: "bottomright" });
 
-      const errorBox =
-        document.getElementById("error-box");
+    emissionLegend.onAdd = function () {
+      const container = L.DomUtil.create("div", "emission-legend");
+      container.innerHTML = `
+        <div class="legend-title">NEI 2020 emissions</div>
+        <div class="legend-row">
+          <span class="marker-symbol" style="background:${noxColors.airports}"></span>
+          Airports — NO<sub>x</sub> ≥150 t/yr
+        </div>
+        <div class="legend-row">
+          <span class="marker-symbol" style="background:${noxColors.egucems}"></span>
+          EGU CEMS — NO<sub>x</sub> ≥250 t/yr
+        </div>
+        <div class="legend-row">
+          <span class="marker-symbol" style="background:${noxColors.egunoncems}"></span>
+          EGU non-CEMS — NO<sub>x</sub> ≥150 t/yr
+        </div>
+        <div class="legend-row">
+          <span class="marker-symbol" style="background:${noxColors.railyard}"></span>
+          Railyards — NO<sub>x</sub> ≥100 t/yr
+        </div>
+        <div class="legend-row">
+          <span class="marker-symbol" style="background:${hapColor}"></span>
+          HAP emission location
+        </div>
+        <div class="legend-note">
+          NO<sub>x</sub> circle area increases with annual emissions.<br>
+          HAP markers use one common size and color.
+        </div>
+      `;
 
-      errorBox.style.display = "block";
-      errorBox.textContent =
-        "Map data error: " + error.message;
+      return container;
+    };
+
+    emissionLegend.addTo(map);
+
+    const helpButton = document.getElementById("help-button");
+    const helpModal = document.getElementById("help-modal");
+    const helpClose = document.getElementById("help-close");
+
+    function openHelpModal() {
+      helpModal.classList.add("open");
+      document.body.style.overflow = "hidden";
+      helpClose.focus();
+    }
+
+    function closeHelpModal() {
+      helpModal.classList.remove("open");
+      document.body.style.overflow = "";
+      helpButton.focus();
+    }
+
+    helpButton.addEventListener("click", openHelpModal);
+    helpClose.addEventListener("click", closeHelpModal);
+
+    helpModal.addEventListener("click", function (event) {
+      if (event.target === helpModal) closeHelpModal();
     });
-  
-  /*
-  TEMPO viewer instruction window
-*/
-const helpButton =
-  document.getElementById("help-button");
 
-const helpModal =
-  document.getElementById("help-modal");
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && helpModal.classList.contains("open")) {
+        closeHelpModal();
+      }
+    });
 
-const helpClose =
-  document.getElementById("help-close");
+    loadNo2Layers();
 
-function openHelpModal() {
-  helpModal.classList.add("open");
-  document.body.style.overflow = "hidden";
-  helpClose.focus();
-}
+    loadNoxLayers().catch(function (error) {
+      reportError("NOx emission layer did not load: " + error.message);
+    });
 
-function closeHelpModal() {
-  helpModal.classList.remove("open");
-  document.body.style.overflow = "";
-  helpButton.focus();
-}
-
-helpButton.addEventListener("click", openHelpModal);
-helpClose.addEventListener("click", closeHelpModal);
-
-/*
-  Close when the user clicks the dark background.
-*/
-helpModal.addEventListener("click", function (event) {
-  if (event.target === helpModal) {
-    closeHelpModal();
-  }
-});
-
-/*
-  Close when the user presses Escape.
-*/
-document.addEventListener("keydown", function (event) {
-  if (
-    event.key === "Escape" &&
-    helpModal.classList.contains("open")
-  ) {
-    closeHelpModal();
-  }
-});</script>
-
+    loadHapLayer().catch(function (error) {
+      reportError("HAP emission layer did not load: " + error.message);
+    });
+  </script>
 </body>
+
 </html>
