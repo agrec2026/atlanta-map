@@ -1224,8 +1224,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <h1>Atlanta TEMPO NO<sub>2</sub> and Emissions Map</h1>
 
     <p class="subtitle">
-      Explore summertime satellite nitrogen dioxide (NO<sub>2</sub>) patterns under contrasting
-      winds and nearby 2020 National Emissions Inventory (NEI) point-source emissions.
+      Explore summertime satellite nitrogen dioxide (NO<sub>2</sub>) patterns
+      under contrasting wind directions and selected point-source emissions
+      from the 2020 National Emissions Inventory (NEI).
     </p>
 
     <div class="intro-lines">
@@ -1236,55 +1237,51 @@ svg.leaflet-image-layer.leaflet-interactive path {
 		href="https://www-air.larc.nasa.gov/missions/tempo/index.html"
 		target="_blank"
 		rel="noopener noreferrer">TEMPO</a>)
-	  is a geostationary satellite mission launched on April 7, 2023.
-	  TEMPO provides hourly daytime air-quality observations over North America
-	  with a spatial resolution of approximately 2 × 4.75 km<sup>2</sup>.
+	  was launched on April 7, 2023, and observes North America from
+	  geostationary orbit. TEMPO provides hourly daytime observations of air
+	  pollution with a spatial footprint of approximately
+	  2 × 4.75 km<sup>2</sup>.
 	</p>
 
       <p>
-        <strong>Where does NO<sub>2</sub> come from?</strong> 
-		<a
-		href="https://www.epa.gov/no2-pollution/basic-information-about-no2"
-		target="_blank"
-		rel="noopener noreferrer">
-		NO<sub>2</sub>
-	  </a>
-	  mainly enters the air when fuel is burned. Sources include
-	  cars, power plants, aircraft, and off-road equipment. These emissions form 
-	  pollution plumes that can contain NO<sub>2</sub> and other pollutants. Wind carry the plumes downwind, affecting communities
-	  even when the sources are not nearby. Mapping these plumes helps show which
-	  sources may influence local air quality.
+        <strong>
+          Where does
+          <a
+            href="https://www.epa.gov/no2-pollution/basic-information-about-no2"
+            target="_blank"
+            rel="noopener noreferrer">NO<sub>2</sub></a>
+          come from?
+        </strong>
+        NO<sub>2</sub> mainly enters the air when fuels are burned. Sources
+        include cars, power plants, aircraft, trains, and off-road equipment.
+        These emissions can form pollution plumes containing NO<sub>2</sub> and
+        other pollutants. Winds can carry the plumes downwind, affecting
+        communities even when the sources are not nearby. Mapping the plumes
+        helps show which sources may influence local air quality.
       </p>
 	  
 	<p>
 	  <strong>What do the emissions markers show?</strong>
-	  	Selected   
-		<a
-		href="https://www.epa.gov/air-emissions-inventories/national-emissions-inventory-nei"
-		target="_blank"
-		rel="noopener noreferrer">
-		2020 NEI
-	  </a>.
-	   emissions of nitrogen oxides
-	  (NO<sub>x</sub>) and
-	  <a
-		href="https://www.epa.gov/haps/about-hazardous-air-pollutants"
-		target="_blank"
-		rel="noopener noreferrer">
-		hazardous air pollutants (HAPs)
-	  </a>
-	  from airports, power plants, and railyards. 
-
-	  The
-	  <a
-		href="https://www.epa.gov/haps/initial-list-hazardous-air-pollutants-modifications"
-		target="_blank"
-		rel="noopener noreferrer">
-		federal HAP list
-	  </a>
-	  includes 188 pollutants.
-	  In metro Atlanta, more than half of NO<sub>x</sub> emissions come from
-	  on-road vehicles, which are not shown on this map.
+      The markers show selected annual point-source emissions from airports,
+      power plants, and railyards that are reported or estimated in the
+      <a
+        href="https://www.epa.gov/air-emissions-inventories/national-emissions-inventory-nei"
+        target="_blank"
+        rel="noopener noreferrer">2020 National Emissions Inventory (NEI)</a>.
+      They include nitrogen oxides (NO<sub>x</sub>) and
+      <a
+        href="https://www.epa.gov/haps/about-hazardous-air-pollutants"
+        target="_blank"
+        rel="noopener noreferrer">hazardous air pollutants (HAPs)</a>. The
+      <a
+        href="https://www.epa.gov/haps/initial-list-hazardous-air-pollutants-modifications"
+        target="_blank"
+        rel="noopener noreferrer">federal HAP list</a>
+      includes 188 pollutants. Some HAPs can cause cancer or other serious
+      health effects, and routine HAP monitoring is limited. These markers show
+      emissions, not real-time air concentrations or personal exposure. In
+      metro Atlanta, more than half of NO<sub>x</sub> emissions come from
+      on-road vehicles, which are not shown on this map.
 	</p>
 	  
 	  
@@ -1314,7 +1311,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
           </button>
 
           <button id="help-button" class="map-button secondary" type="button">
-            View Today’s TEMPO NO<sub>2</sub>
+            View Today’s TEMPO NO<sub>2</sub> Map
           </button>
         </div>
       </div>
@@ -1373,7 +1370,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
         &times;
       </button>
 
-      <h2 id="help-title">How to view the latest TEMPO NO<sub>2</sub></h2>
+      <h2 id="help-title">How to view today’s TEMPO NO<sub>2</sub> map</h2>
 
       <p>
         Use the official TEMPO public viewer to explore recent
@@ -1432,14 +1429,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       railyard: "Railyards"
     };
 
-    const noxThresholds = {
-      airports: 150,
-      egucems: 250,
-      egunoncems: 150,
-      railyard: 100
-    };
-
-	const noxColor = "#7b2cbf";
+    const noxColor = "#7b2cbf";
 
     const hapColor = "#00897b";
 
@@ -1605,7 +1595,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
         <div style="min-width:245px;line-height:1.45">
           <strong>${escapeHtml(config.transport)}</strong><br>
           ${escapeHtml(config.period)}<br>
-          JJA 2024–2025 mean; TEMPO L2 NO<sub>2</sub> V04<br>
+          June–August 2024–2025 mean; TEMPO Level 2 NO<sub>2</sub>
+          Version 04<br>
           NO<sub>2</sub> vertical column:
           <strong>${escapeHtml(no2Text)}</strong>
           ${escapeHtml(unit)}
@@ -1635,8 +1626,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
       container.innerHTML = `
         <strong>Selected TEMPO layer:</strong><br>
-        Average over June–August 2024–2025 using TEMPO Version 4 Level 2 NO<sub>2</sub>
-        data. Eastward transport occurred on 95 days (54%); westward transport occurred on 65 days (37%).
+        Each layer is averaged over June–August 2024–2025 using TEMPO
+        Level 2 NO<sub>2</sub> Version 04 data. Eastward transport occurred on
+        95 days (54%); westward transport occurred on 65 days (37%).
       `;
     }
 
@@ -1645,7 +1637,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
       for (const config of layerConfigs) {
         try {
-          const response = await fetch(config.file + "?v=20260806");
+          const response = await fetch(config.file + "?v=20260807");
 
           if (!response.ok) {
             throw new Error(`${config.file}: HTTP ${response.status}`);
@@ -1721,7 +1713,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
 	async function loadNoxLayers() {
   const response = await fetch(
-    "nei2020_nox_point_sources.geojson?v=20260806"
+    "nei2020_nox_point_sources.geojson?v=20260807"
   );
 
   if (!response.ok) {
@@ -1824,85 +1816,6 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
   ensureLayerControlHeadings();
 }
-      const response = await fetch(
-        "nei2020_nox_point_sources.geojson?v=20260806"
-      );
-
-      if (!response.ok) {
-        throw new Error(`NOx sources: HTTP ${response.status}`);
-      }
-
-      const geojson = await response.json();
-      const validFeatures = (geojson.features || []).filter(function (feature) {
-        const coordinates = feature.geometry?.coordinates || [];
-        const emission = Number(feature.properties?.emissions_tpy);
-
-        return feature.geometry?.type === "Point" &&
-          Number.isFinite(Number(coordinates[0])) &&
-          Number.isFinite(Number(coordinates[1])) &&
-          Number.isFinite(emission);
-      });
-
-      const maximumEmission = Math.max(
-        ...validFeatures.map(function (feature) {
-          return Number(feature.properties.emissions_tpy);
-        }),
-        1
-      );
-
-      const categoryLayers = {};
-      Object.keys(sourceLabels).forEach(function (sourceType) {
-        categoryLayers[sourceType] = L.layerGroup();
-      });
-
-      validFeatures.forEach(function (feature) {
-        const properties = feature.properties || {};
-        const coordinates = feature.geometry.coordinates;
-        const lon = Number(coordinates[0]);
-        const lat = Number(coordinates[1]);
-        const emission = Number(properties.emissions_tpy);
-        const sourceType = String(properties.source_type || "").toLowerCase();
-
-        if (!categoryLayers[sourceType]) return;
-
-        const marker = L.circleMarker([lat, lon], {
-          radius: noxMarkerRadius(emission, maximumEmission),
-          color: "#fff",
-          weight: 1.2,
-          fillColor: noxColors[sourceType],
-          fillOpacity: 0.82
-        });
-
-        marker.bindPopup(`
-          <div style="min-width:220px;line-height:1.45">
-            <strong>NEI 2020 NO<sub>x</sub> source</strong><br>
-            Category: ${escapeHtml(sourceLabels[sourceType])}<br>
-            Annual NO<sub>x</sub> emissions:
-            <strong>${emission.toFixed(1)} tons/year</strong><br>
-            Display threshold: ≥ ${noxThresholds[sourceType]} tons/year
-          </div>
-        `);
-
-        marker.addTo(categoryLayers[sourceType]);
-        noxSourceRecords.push({
-          latlng: L.latLng(lat, lon),
-          sourceType: sourceType,
-          emission: emission
-        });
-      });
-
-	Object.keys(sourceLabels).forEach(function (sourceType) {
-	  layerControl.addOverlay(
-		categoryLayers[sourceType],
-		layerMenuLabel(
-		  noxColors[sourceType],
-		  `NO<sub>x</sub> — ${sourceLabels[sourceType]}`
-		)
-	  );
-	});
-
-      ensureLayerControlHeadings();
-    }
 
     const pieColors = [
       "#006d77",
@@ -1971,7 +1884,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
       return `
         <div class="hap-popup">
-          <strong>NEI 2020 HAP emission location</strong><br>
+          <strong>NEI 2020 HAP source</strong><br>
           Source category: ${escapeHtml(Array.from(group.sourceTypes)
             .map(function (type) { return sourceLabels[type] || type; })
             .join(", "))}<br>
@@ -1999,7 +1912,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
     async function loadHapLayer() {
       const response = await fetch(
-        "nei2020_hap_point_sources.geojson?v=20260806"
+        "nei2020_hap_point_sources.geojson?v=20260807"
       );
 
       if (!response.ok) {
