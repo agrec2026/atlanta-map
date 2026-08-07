@@ -1229,80 +1229,63 @@ svg.leaflet-image-layer.leaflet-interactive path {
     </p>
 
     <div class="intro-lines">
-      <p>
-        <strong>What is TEMPO?</strong> NASA’s Tropospheric Emissions: Monitoring of Pollution (TEMPO) is a geostationary satellite 
-		mission launched on 7 April 2023. TEMPO provides hourly air quality 
-		over North America during daytime with a spatial resolution of 2 × 4.75 km<sup>2</sup>.
-        <a
-          href="https://www-air.larc.nasa.gov/missions/tempo/index.html"
-          target="_blank"
-          rel="noopener noreferrer">Learn about TEMPO from NASA</a>.
-      </p>
+	<p>
+	  <strong>What is TEMPO?</strong>
+	  NASA’s Tropospheric Emissions: Monitoring of Pollution
+	  (<a
+		href="https://www-air.larc.nasa.gov/missions/tempo/index.html"
+		target="_blank"
+		rel="noopener noreferrer">TEMPO</a>)
+	  is a geostationary satellite mission launched on April 7, 2023.
+	  TEMPO provides hourly daytime air-quality observations over North America
+	  with a spatial resolution of approximately 2 × 4.75 km<sup>2</sup>.
+	</p>
 
       <p>
-        <strong>Where does NO<sub>2</sub> come from?</strong> It
-        forms when fuel burns in vehicles, power plants, aircraft, trains, and industrial equipment. Wind can carry 
-		NO<sub>2</sub> plumes away from their sources, so downwind
-  communities can be affected even when the source is not nearby. Mapping
-  these plumes helps show which sources influence local community.
-        <a
-          href="https://airquality.gsfc.nasa.gov/no2"
-          target="_blank"
-          rel="noopener noreferrer">Learn about NO<sub>2</sub> from NASA</a>.
+        <strong>Where does NO<sub>2</sub> come from?</strong> 
+		  NO<sub>2</sub> mainly enters the air when fuel is burned. Sources include
+  cars, trucks, buses, power plants, aircraft, trains, and off-road equipment.
+  These emissions form pollution plumes that can contain NO<sub>2</sub> and
+  other pollutants. Wind carry the plumes downwind, affecting communities
+  even when the sources are not nearby. Mapping these plumes helps show which
+  sources may influence local air quality.
       </p>
+	  
+	<p>
+	  <strong>What do the emissions markers show?</strong>
+	  	  <a
+		href="https://www.epa.gov/air-emissions-inventories/national-emissions-inventory-nei"
+		target="_blank"
+		rel="noopener noreferrer">
+		2020 National Emissions Inventory (NEI)
+	  </a>.
+	  selected emissions of nitrogen oxides
+	  (NO<sub>x</sub>) and
+	  <a
+		href="https://www.epa.gov/haps/about-hazardous-air-pollutants"
+		target="_blank"
+		rel="noopener noreferrer">
+		hazardous air pollutants (HAPs)
+	  </a>
+	  from airports, power plants, and railyards. 
+
+	  The
+	  <a
+		href="https://www.epa.gov/haps/initial-list-hazardous-air-pollutants-modifications"
+		target="_blank"
+		rel="noopener noreferrer">
+		federal HAP list
+	  </a>
+	  includes 188 pollutants.
+	  In metro Atlanta, more than half of NO<sub>x</sub> emissions come from
+	  on-road vehicles, such as passenger cars and trucks, which are not shown
+	  on this map.
+	</p>
+	  
+	  
     </div>
 
-   <details class="about-details">
-  <summary>More about NO<sub>2</sub> and NEI emissions</summary>
 
-  <div class="about-grid">
-    <p>
-	  <strong>How is NO<sub>2</sub> related to other pollutants?</strong>
-	  NO<sub>2</sub> is part of the nitrogen oxides
-	  (NO<sub>x</sub> = NO + NO<sub>2</sub>) family. Under sunlight,
-NO<sub>2</sub> breaks apart through a process called photolysis, helping
-form ground-level ozone. NO<sub>2</sub> is often higher in the morning
-when fresh emissions accumulate and lower in the afternoon when stronger
-sunlight increases photolysis. Both NO<sub>2</sub> and ozone can harm human health,
-especially by irritating the airways and worsening respiratory conditions
-such as asthma.
-      <a
-        href="https://airquality.gsfc.nasa.gov/surface-level-ozone"
-        target="_blank"
-        rel="noopener noreferrer">
-        Learn about surface ozone from NASA
-      </a>.
-    </p>
-
-    <div class="about-wide">
-      <p>
-        <strong>What do the emissions markers show?</strong>
-        The overlays show selected NO<sub>x</sub> and hazardous air pollutant
-        (HAP) point sources reported in the 2020 NEI. The federal HAP list
-  includes 188 pollutants. Depending on the pollutant and amount of exposure,
-  HAPs may cause cancer or affect the respiratory, nervous, reproductive, or
-  developmental systems. The displayed NO<sub>x</sub> sources include:
-      </p>
-
-      <ul>
-        <li><strong>Airports:</strong> ≥150 tons/year</li>
-
-        <li>
-          <strong>EGU CEMS:</strong> electric generating units with continuous
-          emissions monitoring systems; ≥250 tons/year
-        </li>
-
-        <li>
-          <strong>EGU non-CEMS:</strong> electric generating units without
-          continuous emissions monitoring systems; ≥150 tons/year
-        </li>
-
-        <li><strong>Railyards:</strong> ≥100 tons/year</li>
-      </ul>
-
-    </div>
-  </div>
-</details>
 
     <a class="map-jump" href="#map-heading">Explore the interactive map ↓</a>
   </section>
@@ -1355,14 +1338,17 @@ such as asthma.
     </section>
   </main>
 
+
   <footer class="method-note">
-    <strong>Method:</strong> TEMPO data were oversampled to a 0.01°
-    grid using Sun et al. (2018),
-    <a
-      href="https://doi.org/10.5194/amt-11-6679-2018"
-      target="_blank"
-      rel="noopener noreferrer">https://doi.org/10.5194/amt-11-6679-2018</a>
-  </footer>
+  <strong>Method:</strong>
+  TEMPO data were oversampled to a 0.01° grid using
+  <a
+    href="https://doi.org/10.5194/amt-11-6679-2018"
+    target="_blank"
+    rel="noopener noreferrer">
+    Sun et al. (2018)
+  </a>.
+</footer>
 
   <div id="error-box" class="error-box" role="alert"></div>
 
@@ -1448,12 +1434,7 @@ such as asthma.
       railyard: 100
     };
 
-    const noxColors = {
-      airports: "#7b2cbf",
-      egucems: "#d73027",
-      egunoncems: "#f58b45",
-      railyard: "#1769aa"
-    };
+	const noxColor = "#7b2cbf";
 
     const hapColor = "#00897b";
 
@@ -1733,7 +1714,111 @@ such as asthma.
       return 5 + 15 * Math.sqrt(emission / maximum);
     }
 
-    async function loadNoxLayers() {
+	async function loadNoxLayers() {
+  const response = await fetch(
+    "nei2020_nox_point_sources.geojson?v=20260806"
+  );
+
+  if (!response.ok) {
+    throw new Error(`NOx sources: HTTP ${response.status}`);
+  }
+
+  const geojson = await response.json();
+
+  const validFeatures = (geojson.features || []).filter(function (feature) {
+    const coordinates = feature.geometry?.coordinates || [];
+    const emission = Number(feature.properties?.emissions_tpy);
+
+    return feature.geometry?.type === "Point" &&
+      Number.isFinite(Number(coordinates[0])) &&
+      Number.isFinite(Number(coordinates[1])) &&
+      Number.isFinite(emission);
+  });
+
+  /*
+    Use the maximum value across all four source categories
+    to create one consistent marker-size scale.
+  */
+  const maximumEmission = Math.max(
+    ...validFeatures.map(function (feature) {
+      return Number(feature.properties.emissions_tpy);
+    }),
+    1
+  );
+
+  /*
+    All NOx source categories are placed in one layer.
+  */
+  const noxLayer = L.layerGroup();
+
+  validFeatures.forEach(function (feature) {
+    const properties = feature.properties || {};
+    const coordinates = feature.geometry.coordinates;
+
+    const lon = Number(coordinates[0]);
+    const lat = Number(coordinates[1]);
+    const emission = Number(properties.emissions_tpy);
+    const sourceType =
+      String(properties.source_type || "").toLowerCase();
+
+    /*
+      Keep only the four recognized source categories.
+    */
+    if (
+      !Object.prototype.hasOwnProperty.call(
+        sourceLabels,
+        sourceType
+      )
+    ) {
+      return;
+    }
+
+    const marker = L.circleMarker([lat, lon], {
+      radius: noxMarkerRadius(
+        emission,
+        maximumEmission
+      ),
+      color: "#ffffff",
+      weight: 1.2,
+      fillColor: noxColor,
+      fillOpacity: 0.82
+    });
+
+    marker.bindPopup(`
+      <div style="min-width:220px;line-height:1.45">
+        <strong>NEI 2020 NO<sub>x</sub> source</strong><br>
+        Category: ${escapeHtml(sourceLabels[sourceType])}<br>
+        Annual NO<sub>x</sub> emissions:
+        <strong>${emission.toFixed(1)} tons/year</strong>
+      </div>
+    `);
+
+    marker.addTo(noxLayer);
+
+    /*
+      Retain each source record for the
+      Find My Location function.
+    */
+    noxSourceRecords.push({
+      latlng: L.latLng(lat, lon),
+      sourceType: sourceType,
+      emission: emission
+    });
+  });
+
+  /*
+    Add only one NOx selection to the layer menu.
+  */
+  layerControl.addOverlay(
+    noxLayer,
+    layerMenuLabel(
+      noxColor,
+      "NO<sub>x</sub> point sources"
+    )
+  );
+
+  ensureLayerControlHeadings();
+}
       const response = await fetch(
         "nei2020_nox_point_sources.geojson?v=20260806"
       );
