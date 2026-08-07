@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Mobile-first layout revision: 2026-08-07 -->
+<!-- Mobile-first layout and grouped layer-menu revision: 2026-08-07 -->
 <html lang="en">
 
 <head>
@@ -923,8 +923,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
       line-height: 1.5;
     }
 
-    .legend,
-    .emission-legend {
+    .legend {
       padding: 9px 10px;
       color: #333;
       background: var(--panel);
@@ -953,21 +952,35 @@ svg.leaflet-image-layer.leaflet-interactive path {
       border: 1px solid #777;
     }
 
-    .marker-symbol {
+    .layer-group-title {
+      margin: 4px 0 6px;
+      padding: 3px 0 5px;
+      color: #173d78;
+      border-bottom: 1px solid #c8d3e0;
+      font-size: 12.5px;
+      font-weight: bold;
+    }
+
+    .layer-menu-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .layer-menu-symbol {
       display: inline-block;
-      width: 11px;
-      height: 11px;
+      width: 10px;
+      height: 10px;
       flex: 0 0 auto;
-      margin-right: 7px;
       border: 1.5px solid #fff;
       border-radius: 50%;
       box-shadow: 0 0 0 1px #555;
     }
 
-    .legend-note {
-      margin-top: 5px;
+    .layer-group-note {
+      margin: 7px 0 2px 20px;
       color: #666;
-      font-size: 10.5px;
+      font-size: 10px;
       line-height: 1.3;
     }
 
@@ -1497,6 +1510,60 @@ svg.leaflet-image-layer.leaflet-interactive path {
       }
     ).addTo(map);
 
+    function layerMenuLabel(color, text) {
+      return `
+        <span class="layer-menu-label">
+          <span
+            class="layer-menu-symbol"
+            style="background:${color}"
+            aria-hidden="true">
+          </span>
+          <span>${text}</span>
+        </span>
+      `;
+    }
+
+    function ensureLayerControlHeadings() {
+      const container = layerControl.getContainer();
+      if (!container) return;
+
+      const baseList = container.querySelector(
+        ".leaflet-control-layers-base"
+      );
+      const overlayList = container.querySelector(
+        ".leaflet-control-layers-overlays"
+      );
+
+      if (
+        baseList &&
+        baseList.querySelector("label") &&
+        !baseList.querySelector(".layer-group-title")
+      ) {
+        const heading = document.createElement("div");
+        heading.className = "layer-group-title";
+        heading.innerHTML = "TEMPO NO<sub>2</sub> columns";
+        baseList.prepend(heading);
+      }
+
+      if (
+        overlayList &&
+        overlayList.querySelector("label") &&
+        !overlayList.querySelector(".layer-group-title")
+      ) {
+        const heading = document.createElement("div");
+        heading.className = "layer-group-title";
+        heading.textContent = "NEI 2020 point sources";
+        overlayList.prepend(heading);
+
+        const note = document.createElement("div");
+        note.className = "layer-group-note";
+        note.innerHTML =
+          "NO<sub>x</sub> circle area increases with annual emissions; " +
+          "HAP markers use one common size.";
+        overlayList.append(note);
+      }
+    }
+
     function escapeHtml(value) {
       return String(value ?? "")
         .replaceAll("&", "&amp;")
@@ -1606,6 +1673,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
           no2Layers.push(layer);
           no2LayerItems.push({ layer: layer, config: config });
           layerControl.addBaseLayer(layer, config.name);
+          ensureLayerControlHeadings();
 
           if (firstSuccessfulLayer) {
             layer.addTo(map);
@@ -1733,9 +1801,15 @@ svg.leaflet-image-layer.leaflet-interactive path {
       Object.keys(sourceLabels).forEach(function (sourceType) {
         layerControl.addOverlay(
           categoryLayers[sourceType],
-          `NOx — ${sourceLabels[sourceType]} (≥${noxThresholds[sourceType]} t/yr)`
+          layerMenuLabel(
+            noxColors[sourceType],
+            `NO<sub>x</sub> — ${sourceLabels[sourceType]} ` +
+            `(≥${noxThresholds[sourceType]} t/yr)`
+          )
         );
       });
+
+      ensureLayerControlHeadings();
     }
 
     const pieColors = [
@@ -1913,8 +1987,13 @@ svg.leaflet-image-layer.leaflet-interactive path {
 
       layerControl.addOverlay(
         hapLayer,
-        "HAP emission locations — NEI 2020"
+        layerMenuLabel(
+          hapColor,
+          "HAP emission locations"
+        )
       );
+
+      ensureLayerControlHeadings();
     }
 
     function findNo2AtLocation(latlng) {
@@ -2082,43 +2161,6 @@ svg.leaflet-image-layer.leaflet-interactive path {
     };
 
     no2Legend.addTo(map);
-
-    const emissionLegend = L.control({ position: "bottomright" });
-
-    emissionLegend.onAdd = function () {
-      const container = L.DomUtil.create("div", "emission-legend");
-      container.innerHTML = `
-        <div class="legend-title">NEI 2020 emissions</div>
-        <div class="legend-row">
-          <span class="marker-symbol" style="background:${noxColors.airports}"></span>
-          Airports — NO<sub>x</sub> ≥150 t/yr
-        </div>
-        <div class="legend-row">
-          <span class="marker-symbol" style="background:${noxColors.egucems}"></span>
-          EGU CEMS — NO<sub>x</sub> ≥250 t/yr
-        </div>
-        <div class="legend-row">
-          <span class="marker-symbol" style="background:${noxColors.egunoncems}"></span>
-          EGU non-CEMS — NO<sub>x</sub> ≥150 t/yr
-        </div>
-        <div class="legend-row">
-          <span class="marker-symbol" style="background:${noxColors.railyard}"></span>
-          Railyards — NO<sub>x</sub> ≥100 t/yr
-        </div>
-        <div class="legend-row">
-          <span class="marker-symbol" style="background:${hapColor}"></span>
-          HAP emission location
-        </div>
-        <div class="legend-note">
-          NO<sub>x</sub> circle area increases with annual emissions.<br>
-          HAP markers use one common size and color.
-        </div>
-      `;
-
-      return container;
-    };
-
-    emissionLegend.addTo(map);
 
     const helpButton = document.getElementById("help-button");
     const helpModal = document.getElementById("help-modal");
